@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import Toolbar from './Toolbar'
-import MessageList from './MessageList'
-import ComposeMessage from './ComposeMessage'
+import Toolbar from '../components/Toolbar'
+import MessageList from '../components/MessageList'
+import ComposeMessage from '../components/ComposeMessage'
+
 
 class App extends Component {
 
   constructor(props) {
     super(props)
-    this.state = { messages: props.messages }
+    this.state = { messages: [] }
   }
 
   async componentDidMount() {
@@ -51,7 +52,7 @@ class App extends Component {
     await this.updateMessages({
       "messageIds": [ message.id ],
       "command": "star",
-      "star": message.starred
+      "star": !message.starred
     })
 
     this.toggleProperty(message, 'starred')
