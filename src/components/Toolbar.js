@@ -1,9 +1,9 @@
 import React from 'react'
+import { Link, Route, Switch } from 'react-router-dom'
 
 const Toolbar = ({
   messages,
   toggleSelectAll,
-  toggleCompose,
   markAsRead,
   markAsUnread,
   applyLabel,
@@ -35,9 +35,20 @@ const Toolbar = ({
           unread {unreadCount === 1 ? 'message' : 'messages'}
         </p>
 
-        <button className="btn btn-danger" onClick={toggleCompose}>
-          <i className={`fa fa-plus`}></i>
-        </button>
+        <Switch>
+         <Route path="/compose" render={ () => (
+           <Link className="btn btn-danger" to="/">
+             <i className={`fa fa-plus`}></i>
+           </Link>
+         )} />
+         <Route render={ () => (
+           <Link className="btn btn-danger" to="/compose">
+             <i className={`fa fa-plus`}></i>
+           </Link>
+         )} />
+       </Switch>
+
+
 
         <button className="btn btn-default" onClick={toggleSelectAll}>
           <i className={`fa ${selectAllClass}`}></i>

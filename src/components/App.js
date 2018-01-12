@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Route } from 'react-router-dom'
 import Toolbar from '../components/Toolbar'
 import MessageList from '../components/MessageList'
 import ComposeMessage from '../components/ComposeMessage'
@@ -106,10 +107,6 @@ class App extends Component {
     })
   }
 
-  toggleCompose() {
-    this.setState({composing: !this.state.composing})
-  }
-
   async applyLabel(label) {
     await this.updateMessages({
       "messageIds": this.state.messages.filter(message => message.selected).map(message => message.id),
@@ -186,16 +183,13 @@ class App extends Component {
             markAsUnread={this.markAsUnread.bind(this)}
             deleteMessages={this.deleteMessages.bind(this)}
             toggleSelectAll={this.toggleSelectAll.bind(this)}
-            toggleCompose={this.toggleCompose.bind(this)}
             applyLabel={this.applyLabel.bind(this)}
             removeLabel={this.removeLabel.bind(this)}
             />
 
-          {
-            this.state.composing ?
-              <ComposeMessage sendMessage={ this.sendMessage.bind(this) } /> :
-              null
-          }
+          <Route path='/compose' render={() => (
+            <ComposeMessage sendMessage={ this.sendMessage.bind(this)} />
+          )} />
 
           <MessageList
             messages={this.state.messages}
