@@ -9,10 +9,19 @@ class Message extends Component {
     }
   }
   async componentDidMount() {
-    let data = await fetch(`http://localhost:8082/api/messages/${this.props.message.id}`)
-    let json = await data.json()
-    this.setState({
-      body: json.body
+    const response = await this.request(`/api/messages/${this.props.message.id}`)
+    const json = await response.json()
+    this.setState({body: json.body})
+  }
+  async request(path, method = 'GET', body = null) {
+    if (body) body = JSON.stringify(body)
+    return await fetch(`${process.env.REACT_APP_API_URL}${path}`, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: body
     })
   }
   render() {
@@ -42,7 +51,7 @@ class Message extends Component {
         <div className={`row message ${isRead} ${isSelected}` }>
           <div className="col-xs-1">
             <div className="row">
-              <div className="col-xs-2" onClick={()=>this.props.checkboxClicked(this.props.message)}>
+              <div className="col-xs-2" onClick={()=>this.props.toggleSelect(this.props.message)}>
                 <input type="checkbox" checked={`${check}`} />
               </div>
               <div className="col-xs-2" id={this.props.id} onClick={()=> this.props.starred(this.props.message)}>
