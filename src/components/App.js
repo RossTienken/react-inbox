@@ -190,6 +190,7 @@ class App extends Component {
           <Route path='/compose' render={() => (
             <ComposeMessage sendMessage={ this.sendMessage.bind(this)} />
           )} />
+          
 
           <MessageList
             messages={this.state.messages}
