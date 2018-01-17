@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { fetchMessageBody } from '../actions'
 
 
-export class MessageBody extends React.Component {
+export class MessageBody extends Component {
   componentWillMount() {
     this.props.fetchMessageBody(this.props.messageId)
   }
