@@ -1,52 +1,56 @@
-import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom'
+import React from 'react'
+import { sendMessage } from '../actions'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
-
-class ComposeMessage extends Component {
-  constructor(props) {
-    super(props)
-    this.submitForm = this.submitForm.bind(this)
-  }
-  submitForm (e) {
+const ComposeMessage = ({ composing, sendMessage }) => {
+  const submitForm = (e) => {
     e.preventDefault()
-    this.props.sendMessage({
+    sendMessage({
       subject: e.target.subject.value,
-      body: e.target.body.value
+      body: e.target.body.value,
     })
-    this.props.history.push('/')
   }
 
-  render() {
-    return (
-      <form className="form-horizontal well" onSubmit={ this.submitForm }>
-        <div className="form-group">
-          <div className="col-sm-8 col-sm-offset-2">
-            <h4>Compose Message</h4>
-          </div>
+  return composing ? (
+    <form className="form-horizontal well" onSubmit={ submitForm }>
+      <div className="form-group">
+        <div className="col-sm-8 col-sm-offset-2">
+          <h4>Compose Message</h4>
         </div>
+      </div>
 
-        <div className="form-group">
-          <label htmlFor="subject" className="col-sm-2 control-label">Subject</label>
-          <div className="col-sm-8">
-            <input type="text" className="form-control" id="subject" placeholder="Enter a subject" name="subject" autoFocus autoComplete="off" />
-          </div>
+      <div className="form-group">
+        <label htmlFor="subject" className="col-sm-2 control-label">Subject</label>
+        <div className="col-sm-8">
+          <input type="text" className="form-control" id="subject" placeholder="Enter a subject" name="subject" autoFocus autoComplete="off" />
         </div>
+      </div>
 
-        <div className="form-group">
-          <label htmlFor="body" className="col-sm-2 control-label">Body</label>
-          <div className="col-sm-8">
-            <textarea name="body" id="body" className="form-control"></textarea>
-          </div>
+      <div className="form-group">
+        <label htmlFor="body" className="col-sm-2 control-label">Body</label>
+        <div className="col-sm-8">
+          <textarea name="body" id="body" className="form-control"></textarea>
         </div>
+      </div>
 
-        <div className="form-group">
-          <div className="col-sm-8 col-sm-offset-2">
-            <input type="submit" value="Send" className="btn btn-primary" />
-          </div>
+      <div className="form-group">
+        <div className="col-sm-8 col-sm-offset-2">
+          <input type="submit" value="Send" className="btn btn-primary" />
         </div>
-      </form>
-    )
-  }
+      </div>
+
+    </form>
+  ) : null;
 }
 
-export default withRouter(ComposeMessage)
+const mapStateToProps = ({ messages }) => composing: messages.composing
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+  sendMessage
+}, dispatch)
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ComposeMessage)
