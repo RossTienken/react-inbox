@@ -54,7 +54,7 @@ class Message extends Component {
               <div className="col-xs-2" onClick={()=>this.props.toggleSelect(this.props.message)}>
                 <input type="checkbox" checked={`${check}`} />
               </div>
-              <div className="col-xs-2" id={this.props.id} onClick={()=> this.props.starred(this.props.message)}>
+              <div className="col-xs-2" id={this.props.id} onClick={()=> this.props.toggleStar(this.props.message)}>
                 <i className={`${isStarred}`} id={this.props.id}></i>
               </div>
             </div>
