@@ -1,84 +1,82 @@
-import { Route, Link } from 'react-router-dom'
-import React, { Component } from 'react';
+import React from 'react'
+import { Route, withRouter } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { toggleSelect, toggleStar } from '../actions'
+import MessageBody from './MessageBody'
 
-class Message extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      body: []
-    }
-  }
-  async componentDidMount() {
-    const response = await this.request(`/api/messages/${this.props.message.id}`)
-    const json = await response.json()
-    this.setState({body: json.body})
-  }
-  async request(path, method = 'GET', body = null) {
-    if (body) body = JSON.stringify(body)
-    return await fetch(`${process.env.REACT_APP_API_URL}${path}`, {
-      method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: body
-    })
-  }
-  render() {
-    let isSelected = ""
-    let isRead
-    let check = ""
-    let isStarred = ""
-    if(this.props.message.read === true) {
-      isRead = "read"
-    }
-    else {
-      isRead = "unread"
-    }
-    if(this.props.message.selected === true) {
-      check = "checked"
-    }
-    if(this.props.message.starred === true) {
-      isStarred = "star fa fa-star"
-    }
-    else {
-      isStarred = "star fa fa-star-o"
-    }
-    if(this.props.message.selected === true) {
-      isSelected = "selected"
-    }
-    return(
-        <div className={`row message ${isRead} ${isSelected}` }>
-          <div className="col-xs-1">
-            <div className="row">
-              <div className="col-xs-2" onClick={()=>this.props.toggleSelect(this.props.message)}>
-                <input type="checkbox" checked={`${check}`} />
-              </div>
-              <div className="col-xs-2" id={this.props.id} onClick={()=> this.props.toggleStar(this.props.message)}>
-                <i className={`${isStarred}`} id={this.props.id}></i>
-              </div>
-            </div>
+const Message = ({
+  messageId,
+  subject,
+  read,
+  selected,
+  starred,
+  labels,
+  toggleSelect,
+  toggleStar,
+  history
+}) => {
+  const readClass = read ? 'read' : 'unread'
+  const selectedClass = selected ? 'selected' : ""
+  const starClass = starred ? 'fa-star' : 'fa-star-o'
+
+  const renderedLables = labels.map((label, i) => (
+    <span key={i} className="label label-warning">{label}</span>
+  ))
+
+  return [
+    <div key="message" className={`row message ${readClass} ${selectedClass}`}>
+      <div className="col-xs-1">
+        <div className="row">
+          <div className="col-xs-2">
+            <input
+              type="checkbox"
+              checked={ !!selected }
+              readOnly={ true }
+              onClick={() => toggleSelect(messageId)}
+              />
           </div>
-          <div className="col-xs-11">
-            {this.props.message.labels.map((ele,i)=> {
-              return(
-                <span key= {i} className="label label-warning">{ele}</span>
-              )
-            })}
-              <Link to= {`/messages/${this.props.message.id}`}>
-                <span onClick={this.props.markRead} id={this.props.message.id}> {this.props.message.subject}</span>
-              </Link>
+          <div className="col-xs-2" onClick={() => toggleStar(messageId)}>
+            <i className={`star fa ${starClass}`}></i>
           </div>
-          <Route path={`/messages/${this.props.message.id}`} render={ () => (
-            <div className="row message-body">
-              <div className="col-xs-11 col-xs-offset-1">
-                <br></br>
-                 {this.state.body}
-              </div>
-            </div>
-          )}/>
         </div>
-    )
+      </div>
+      <div className="col-xs-11">
+        {renderedLables}
+        <Link to={`/messages/${messageId}`}>{subject}</Link>
+      </div>
+    </div>,
+
+    <Route
+      key="message-body"
+      path={ `/messages/${messageId}` }
+      render={ props => {
+        return <MessageBody messageId={messageId} {...props} />
+      }} />
+  ]
+}
+
+const mapStateToProps = (state, { messageId }) => {
+  const byId = state.messages.byId
+  const message = byId[messageId]
+  const { subject, read, selected, starred, labels } = message
+  return {
+    messageId,
+    subject,
+    read,
+    selected,
+    starred,
+    labels
   }
 }
-export default Message
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+  toggleSelect,
+  toggleStar
+}, dispatch)
+
+export default withRouter(connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Message))

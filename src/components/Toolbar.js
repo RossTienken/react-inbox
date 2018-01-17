@@ -1,26 +1,38 @@
 import React from 'react'
-import { Link, Route, Switch } from 'react-router-dom'
+import {
+  markAsRead,
+  markAsUnread,
+  deleteMessages,
+  toggleSelectAll,
+  applyLabel,
+  removeLabel,
+  toggleCompose
+} from '../actions'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { Link, Route, Switch, withRouter } from 'react-router-dom'
 
 const Toolbar = ({
-  messages,
+  messagesLength,
+  unreadCount,
+  selectedCount,
   toggleSelectAll,
+  toggleCompose,
   markAsRead,
   markAsUnread,
   applyLabel,
   removeLabel,
   deleteMessages,
 }) => {
-  const unreadCount = messages.filter(message => !message.read).length
-  const selectedCount = messages.filter(message => message.selected).length
   let selectAllClass
 
   switch(selectedCount) {
     case 0:
       selectAllClass = 'fa-square-o'
-      break;
-    case messages.length:
+      break
+    case messagesLength:
       selectAllClass = 'fa-check-square-o'
-      break;
+      break
     default:
       selectAllClass = 'fa-minus-square-o'
   }
@@ -48,24 +60,23 @@ const Toolbar = ({
          )} />
        </Switch>
 
-
-
-        <button className="btn btn-default" onClick={toggleSelectAll}>
+        <button className="btn btn-default" onClick={() => toggleSelectAll()}>
           <i className={`fa ${selectAllClass}`}></i>
         </button>
 
-        <button className="btn btn-default" onClick={markAsRead} disabled={selectedCount === 0}>
+        <button className="btn btn-default" onClick={() => markAsRead()} disabled={selectedCount === 0}>
           Mark As Read
         </button>
 
-        <button className="btn btn-default" onClick={markAsUnread} disabled={selectedCount === 0}>
+        <button className="btn btn-default" onClick={() => markAsUnread()} disabled={selectedCount === 0}>
           Mark As Unread
         </button>
 
         <select
           className="form-control label-select"
           disabled={selectedCount === 0}
-          onChange={(e) => {applyLabel(e.target.value); e.target.selectedIndex = 0}}
+          // eslint-disable-next-line
+          onChange={(e) => {applyLabel(e.target.value), e.target.selectedIndex = 0}}
           >
           <option>Apply label</option>
           <option value="dev">dev</option>
@@ -76,7 +87,8 @@ const Toolbar = ({
         <select
           className="form-control label-select"
           disabled={selectedCount === 0}
-          onChange={(e) => {removeLabel(e.target.value); e.target.selectedIndex = 0}}
+          // eslint-disable-next-line
+          onChange={(e) => {removeLabel(e.target.value), e.target.selectedIndex = 0}}
           >
           <option>Remove label</option>
           <option value="dev">dev</option>
@@ -84,7 +96,7 @@ const Toolbar = ({
           <option value="gschool">gschool</option>
         </select>
 
-        <button className="btn btn-default" onClick={deleteMessages} disabled={selectedCount === 0}>
+        <button className="btn btn-default" onClick={() => deleteMessages()} disabled={selectedCount === 0}>
           <i className="fa fa-trash-o"></i>
         </button>
       </div>
@@ -92,4 +104,29 @@ const Toolbar = ({
   )
 }
 
-export default Toolbar
+const mapStateToProps = (state, { messageId }) => {
+  const { byId, allIds } = state.messages
+  const unreadCount = allIds.filter(messageId => !byId[messageId].read).length
+  const selectedCount =  allIds.filter(messageId => byId[messageId].selected).length
+  const messagesLength = allIds.length
+  return {
+    messagesLength,
+    unreadCount,
+    selectedCount
+  }
+}
+
+const mapDispatchToProps = dispatch => bindActionCreators({
+  markAsRead,
+  markAsUnread,
+  deleteMessages,
+  toggleSelectAll,
+  applyLabel,
+  removeLabel,
+  toggleCompose
+}, dispatch)
+
+export default withRouter(connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Toolbar))

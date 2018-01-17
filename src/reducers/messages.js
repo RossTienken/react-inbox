@@ -12,6 +12,7 @@ import {
   MESSAGES_REMOVE_LABEL,
   MESSAGE_SEND_STARTED,
   MESSAGE_SEND_COMPLETE,
+  MESSAGE_BODY_REQUEST_SUCCESS
 } from '../actions'
 
 const initialState = {
@@ -57,11 +58,9 @@ export default (state = initialState, action) => {
         byId: setPropertyValueOnCollection(state.byId, action.messageIds, 'read', false)
       }
     case MESSAGES_DELETED:
-      console.log(action.messageIds,action.messageIds.indexOf(6) );
       return {
         ...state,
         allIds: state.allIds.filter(messageId => {
-          console.log(messageId,action.messageIds.indexOf(messageId) );
           return action.messageIds.indexOf(messageId) === -1
         }),
       }
@@ -85,11 +84,11 @@ export default (state = initialState, action) => {
       }
     case MESSAGES_APPLY_LABEL:
       const newById = action.messageIds.reduce((byId, messageId) => {
-        const message = byId[messageId];
+        const message = byId[messageId]
         const newLabels =  !message.labels.includes(action.label) ? [...message.labels, action.label].sort() : message.labels
         const newById = setPropertyValue(byId, messageId, 'labels', newLabels)
         return newById
-      }, state.byId);
+      }, state.byId)
 
       return {
         ...state,
@@ -97,25 +96,30 @@ export default (state = initialState, action) => {
       }
     case MESSAGES_REMOVE_LABEL:
       const byId = action.messageIds.reduce((byId, messageId) => {
-        const message = byId[messageId];
+        const message = byId[messageId]
         const index = message.labels.indexOf(action.label)
-        let newLabels;
+        let newLabels
         if ( index > -1) {
           newLabels = [
             ...message.labels.slice(0, index),
             ...message.labels.slice(index + 1)
           ]
         } else {
-          newLabels = message.labels;
+          newLabels = message.labels
         }
 
         const newById = setPropertyValue(byId, messageId, 'labels', newLabels)
         return newById
-      }, state.byId);
+      }, state.byId)
 
       return {
         ...state,
         byId
+      }
+    case MESSAGE_BODY_REQUEST_SUCCESS:
+      return {
+        ...state,
+        byId: setPropertyValue(state.byId, action.messageId, 'body', action.body)
       }
     case MESSAGE_SEND_STARTED:
       return {
@@ -155,7 +159,7 @@ function setPropertyValueOnCollection(byId, messageIds, property, value) {
     return newById
   }, byId)
 
-  return newById;
+  return newById
 }
 
 function setPropertyValue(byId, messageId, property, value) {

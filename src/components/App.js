@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import Toolbar from '../components/Toolbar'
-import Messages from '../components/Messages'
-import ComposeMessage from '../components/ComposeMessage'
+import Toolbar from './Toolbar'
+import MessageList from './MessageList'
+import ComposeMessage from './ComposeMessage'
 import { getMessages } from '../actions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -32,13 +32,8 @@ class App extends Component {
 
         <div className="container">
           <Toolbar />
-          {
-            <Route
-             path="/compose"
-             component={ComposeMessage}
-            />
-          }
-          <Messages />
+          <Route path="/compose" component={ ComposeMessage } />
+          <MessageList />
         </div>
       </div>
     );

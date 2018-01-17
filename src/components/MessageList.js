@@ -1,18 +1,11 @@
 import React from 'react'
 import Message from './Message'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 
-const MessagesList = ({
-  messages,
-  toggleSelect,
-  toggleStar,
-}) => {
-  const messageComponents = messages.map(message => (
-    <Message
-      key={message.id}
-      message={message}
-      toggleSelect={toggleSelect}
-      toggleStar={toggleStar}
-      />
+const MessageList = ({ messageIds }) => {
+  const messageComponents = messageIds.map(id => (
+    <Message key={id} messageId={id} />
   ))
 
   return (
@@ -22,4 +15,6 @@ const MessagesList = ({
   )
 }
 
-export default MessagesList
+const mapStateToProps = state => ({messageIds: state.messages.allIds})
+
+export default withRouter(connect(mapStateToProps)(MessageList))
